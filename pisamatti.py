@@ -1,13 +1,16 @@
+# -*- coding: iso-8859-15 -*-
 # Author: Tatu Tomppo
-# copy free
+# copy free - Python 3.5 or later needed(tkinter, etc....)
+# You need "pip install wx"
+
 import random
 import tkinter
 from tkinter import ttk
 import os
 import configparser
- 
 
-import wx
+
+
 class Adder(ttk.Frame):
 
 
