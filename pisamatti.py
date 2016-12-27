@@ -43,11 +43,11 @@ class PisaMath(ttk.Frame):
         if (self.v.get() == 1):
             self.first_number = random.randint(RANDOM_MIN_MULTI, RANDOM_MAX_MULTI)
             self.second_number = random.randint(RANDOM_MIN_MULTI, RANDOM_MAX_MULTI)
-            self.num1_entry['text'] = str(self.first_number) + str("*") + str(self.second_number)
+            self.equation_label['text'] = str(self.first_number) + str("*") + str(self.second_number)
         else:
             self.first_number = random.randint(RANDOM_MIN_ADDITION, RANDOM_MAX_ADDITION)
             self.second_number = random.randint(RANDOM_MIN_ADDITION, RANDOM_MAX_ADDITION)
-            self.num1_entry['text'] = str(self.first_number) + str("+") + str(self.second_number)
+            self.equation_label['text'] = str(self.first_number) + str("+") + str(self.second_number)
 
     if not os.path.isfile(configfile_name):
         # Create the configuration file as it doesn't exist yet
@@ -72,7 +72,7 @@ class PisaMath(ttk.Frame):
         self.OnPressEnter = None
         self.root = parent
         self.init_gui()
-        self.num1_entry['text'] = str(self.first_number) + str("*") + str(self.second_number)
+        self.equation_label['text'] = str(self.first_number) + str("*") + str(self.second_number)
         self.correct_answers_label['text'] = TOTAL_SCORE_TEXT + str(self.correct_answers)
         self.result_label['text'] = START_STATUS_TEXT
         self.rdbm.invoke()
@@ -86,16 +86,16 @@ class PisaMath(ttk.Frame):
     def calculate(self):
 
         try:
-            num2 = int(self.answer_entry.get())
+            given_answer = int(self.answer_entry.get())
         except:
-            num2 = 0;
+            given_answer = 0
 
-        textlen =  len(self.answer_entry.get())
+        textlen = len(self.answer_entry.get())
 
         self.answer_entry.delete(0, textlen)
         self.answer_entry.update()
 
-        if(num2 == 0):
+        if(given_answer == 0):
             self.result_label['text'] = GIVE_ANSWER_TEXT
             return
 
@@ -105,7 +105,7 @@ class PisaMath(ttk.Frame):
         else:
             correct_answer = self.first_number + self.second_number
 
-        if(num2 == correct_answer) :
+        if(given_answer == correct_answer) :
 
             self.randomize_nums()
             self.correct_answers = self.correct_answers + 1
@@ -124,30 +124,25 @@ class PisaMath(ttk.Frame):
             self.result_label['text'] = WRONG_TEXT
             self.correct_answers_label['text'] = TOTAL_SCORE_TEXT + str(self.correct_answers)
 
-    def OnEnter(self, event):
+    def on_enter(self, event):
         self.calculate()
 
     def init_gui(self):
 
         self.root.title(APPLICATION_NAME_TEXT)
-        self.root.option_add('*tearOff', 'FALSE')
-        self.grid(column=0, row=0, sticky='nsew')
-        self.menubar = tkinter.Menu(self.root)
-        self.menu_file = tkinter.Menu(self.menubar)
-        self.menu_file.add_command(label='Exit', command=self.on_quit)
-        self.menu_edit = tkinter.Menu(self.menubar)
-        self.root.config(menu=self.menubar)
 
-        self.num1_entry = ttk.Label(self)
-        self.num1_entry.grid(column=0, row=2)
+        self.grid(column=0, row=0)
+        self.equation_label = ttk.Label(self)
+        self.equation_label.grid(column=0, row=2)
         ttk.Label(self, text=EQUALS_TEXT).grid(column=1, row=2)
         self.answer_entry = ttk.Entry(self, width=10)
-        self.answer_entry.bind("<Return>", self.OnEnter)
+        self.answer_entry.bind("<Return>", self.on_enter)
         self.answer_entry.grid(column=2, row=2)
         self.calc_button = ttk.Button(self, text=CHECK_RESULT_BUTTON_TEXT, command=self.calculate)
         self.calc_button.grid(column=2, row=3, columnspan=1)
         self.result_label = ttk.Label(self, text='')
         self.result_label.grid(column=0, row=4)
+
         ttk.Separator(self, orient='horizontal').grid(column=0, row=5, columnspan=4, sticky='ew')
         self.correct_answers_label = ttk.Label(self, text='')
         self.correct_answers_label.grid(column=0, row=6, sticky='we')
@@ -170,6 +165,6 @@ class PisaMath(ttk.Frame):
 
 if __name__ == '__main__':
     root = tkinter.Tk()
-    root.geometry("330x200+30+30")
+    root.maxsize(330,250)
     PisaMath(root)
     root.mainloop()
