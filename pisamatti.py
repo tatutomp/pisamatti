@@ -10,18 +10,17 @@ import os
 import configparser
 
 APPLICATION_NAME_TEXT = "Pisa Math"
-CALCULATE_THIS_TEXT = "Laske"
 CHECK_RESULT_BUTTON_TEXT = "Tarkista"
-CORRECT_ANSWER_TEXT = "Oikein"
 # This is shown when correct answer is given
-CORRECT_TEXT = "Oikein! "
+CORRECT_ANSWER_TEXT = "Oikein"
 # This is shown when user have not entered answer and tries to check result (press enter)
 GIVE_ANSWER_TEXT = 'Anna vastaus, kiitos'
+START_STATUS_TEXT = 'Laske oheinen lasku ja paina enter'
 TOTAL_SCORE_TEXT = 'Pisteet: '
 STATUS_TEXT = "Tilanne"
 # This is shown when wrong answer is given
 WRONG_TEXT = "V‰‰rin! "
-YOUR_ANSWER_TEXT = "Vastaus"
+EQUALS_TEXT = "="
 
 
 
@@ -56,7 +55,8 @@ class PisaMath(ttk.Frame):
         self.root = parent
         self.init_gui()
         self.num1_entry['text'] = str(self.eka_luku) + str("*") + str(self.toka_luku)
-        self.answer_label['text'] = TOTAL_SCORE_TEXT + str(self.correct_answers)
+        self.correct_answers_label['text'] = TOTAL_SCORE_TEXT + str(self.correct_answers)
+        self.result_label['text'] = START_STATUS_TEXT
 
     def on_quit(self):
        quit()
@@ -64,17 +64,17 @@ class PisaMath(ttk.Frame):
     def calculate(self):
 
         try:
-            num2 = int(self.num2_entry.get())
+            num2 = int(self.answer_entry.get())
         except:
             num2 = 0;
 
-        textlen =  len(self.num2_entry.get())
+        textlen =  len(self.answer_entry.get())
 
-        self.num2_entry.delete(0, textlen)
-        self.num2_entry.update()
+        self.answer_entry.delete(0, textlen)
+        self.answer_entry.update()
 
         if(num2 == 0):
-            self.answer_label['text'] = GIVE_ANSWER_TEXT
+            self.result_label['text'] = GIVE_ANSWER_TEXT
             return
 
         if( num2 == self.eka_luku*self.toka_luku) :
@@ -83,7 +83,8 @@ class PisaMath(ttk.Frame):
             self.toka_luku =  random.randint(2,9)
             self.correct_answers = self.correct_answers + 1
             self.num1_entry['text'] = str(self.eka_luku) + str("*") + str(self.toka_luku)
-            self.answer_label['text'] = CORRECT_TEXT + TOTAL_SCORE_TEXT + str(self.correct_answers)
+            self.result_label['text'] = CORRECT_ANSWER_TEXT
+            self.correct_answers_label['text'] = TOTAL_SCORE_TEXT + str(self.correct_answers)
 
             self.cfgfile = open(self.configfile_name, 'w')
             self.Config = configparser.ConfigParser()
@@ -93,7 +94,8 @@ class PisaMath(ttk.Frame):
             self.cfgfile.close()
 
         else:
-            self.answer_label['text'] = WRONG_TEXT + TOTAL_SCORE_TEXT  +str(self.correct_answers)
+            self.result_label['text'] = WRONG_TEXT
+            self.correct_answers_label['text'] = TOTAL_SCORE_TEXT + str(self.correct_answers)
 
     def OnEnter(self, event):
         self.calculate()
@@ -108,21 +110,22 @@ class PisaMath(ttk.Frame):
         self.menu_file.add_command(label='Exit', command=self.on_quit)
         self.menu_edit = tkinter.Menu(self.menubar)
         self.root.config(menu=self.menubar)
-        self.num1_entry = ttk.Label(self, width=20)
-        self.num1_entry.grid(column=1, row = 2)
-        self.num2_entry = ttk.Entry(self, width=5)
-        self.num2_entry.bind("<Return>", self.OnEnter)
-        self.num2_entry.grid(column=3, row=2)
+
+        self.num1_entry = ttk.Label(self)
+        self.num1_entry.grid(column=0, row=2)
+        ttk.Label(self, text=EQUALS_TEXT).grid(column=1, row=2)
+        self.answer_entry = ttk.Entry(self, width=10)
+        self.answer_entry.bind("<Return>", self.OnEnter)
+        self.answer_entry.grid(column=2, row=2)
         self.calc_button = ttk.Button(self, text=CHECK_RESULT_BUTTON_TEXT, command=self.calculate)
-        self.calc_button.grid(column=0, row=3, columnspan=4)
-        self.answer_frame = ttk.LabelFrame(self, text=STATUS_TEXT,height=100)
-        self.answer_frame.grid(column=0, row=4, columnspan=4, sticky='nesw')
-        self.answer_label = ttk.Label(self.answer_frame, text='')
-        self.answer_label.grid(column=0, row=0)
+        self.calc_button.grid(column=2, row=3, columnspan=1)
+        self.result_label = ttk.Label(self, text='')
+        self.result_label.grid(column=0, row=4)
+        ttk.Separator(self, orient='horizontal').grid(column=0, row=5, columnspan=4, sticky='ew')
+        self.correct_answers_label = ttk.Label(self, text='')
+        self.correct_answers_label.grid(column=0, row=6, sticky='we')
         # Labels that remain constant throughout execution.
         ttk.Label(self, text=APPLICATION_NAME_TEXT).grid(column=0, row=0, columnspan=4)
-        ttk.Label(self, text=CALCULATE_THIS_TEXT).grid(column=0, row=2, sticky='w')
-        ttk.Label(self, text=YOUR_ANSWER_TEXT).grid(column=2, row=2, sticky='w')
         ttk.Separator(self, orient='horizontal').grid(column=0, row=1, columnspan=4, sticky='ew')
 
         for child in self.winfo_children():
