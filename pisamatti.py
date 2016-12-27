@@ -28,7 +28,7 @@ configfile_name = 'config.xml'
 
 class PisaMath(ttk.Frame):
 
-     
+
 
     # Check if there is already a configurtion file
     if not os.path.isfile(configfile_name):
