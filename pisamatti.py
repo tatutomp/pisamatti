@@ -9,18 +9,24 @@ from tkinter import ttk
 import os
 import configparser
 
-APPLICATION_NAME_TEXT = "Pisa Math"
-CHECK_RESULT_BUTTON_TEXT = "Tarkista"
+ADDITION_TEXT = 'Plus'
+APPLICATION_NAME_TEXT = 'Pisa Math'
+CHECK_RESULT_BUTTON_TEXT = 'Tarkista'
 # This is shown when correct answer is given
 CORRECT_ANSWER_TEXT = "Oikein"
-# This is shown when user have not entered answer and tries to check result (press enter)
-GIVE_ANSWER_TEXT = 'Anna vastaus, kiitos'
-START_STATUS_TEXT = 'Laske oheinen lasku ja paina enter'
-TOTAL_SCORE_TEXT = 'Pisteet: '
-STATUS_TEXT = "Tilanne"
-# This is shown when wrong answer is given
-WRONG_TEXT = "V‰‰rin! "
 EQUALS_TEXT = "="
+# This is shown when user have not entered answer and tries to check result (press enter)
+GIVE_ANSWER_TEXT = 'Anna vastaus, kiitos.'
+MULTIPLICATION_TEXT = 'Kerto'
+RANDOM_MIN_MULTI = 2
+RANDOM_MAX_MULTI = 9
+RANDOM_MIN_ADDITION = 2
+RANDOM_MAX_ADDITION = 100
+START_STATUS_TEXT = 'Laske!'
+TOTAL_SCORE_TEXT = 'Pisteet: '
+STATUS_TEXT = 'Tilanne'
+# This is shown when wrong answer is given
+WRONG_TEXT = 'V‰‰rin! '
 
 
 
@@ -29,6 +35,20 @@ class PisaMath(ttk.Frame):
 
     configfile_name = 'config.xml'
     # Check if there is already a configuration file
+    first_number = 0
+    second_number = 0
+
+    def randomize_nums(self):
+
+        if (self.v.get() == 1):
+            self.first_number = random.randint(RANDOM_MIN_MULTI, RANDOM_MAX_MULTI)
+            self.second_number = random.randint(RANDOM_MIN_MULTI, RANDOM_MAX_MULTI)
+            self.num1_entry['text'] = str(self.first_number) + str("*") + str(self.second_number)
+        else:
+            self.first_number = random.randint(RANDOM_MIN_ADDITION, RANDOM_MAX_ADDITION)
+            self.second_number = random.randint(RANDOM_MIN_ADDITION, RANDOM_MAX_ADDITION)
+            self.num1_entry['text'] = str(self.first_number) + str("+") + str(self.second_number)
+
     if not os.path.isfile(configfile_name):
         # Create the configuration file as it doesn't exist yet
         cfgfile = open(configfile_name, 'w')
@@ -46,20 +66,22 @@ class PisaMath(ttk.Frame):
     correct_answers = int(settings.get('configs', 'correct_answers'))
     random.SystemRandom()
     random.seed()
-    eka_luku = random.randint(2,9)
-    toka_luku = random.randint(2,9)
 
     def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.OnPressEnter = None
         self.root = parent
         self.init_gui()
-        self.num1_entry['text'] = str(self.eka_luku) + str("*") + str(self.toka_luku)
+        self.num1_entry['text'] = str(self.first_number) + str("*") + str(self.second_number)
         self.correct_answers_label['text'] = TOTAL_SCORE_TEXT + str(self.correct_answers)
         self.result_label['text'] = START_STATUS_TEXT
+        self.rdbm.invoke()
 
     def on_quit(self):
        quit()
+
+    def change_calc_type(self):
+        self.randomize_nums()
 
     def calculate(self):
 
@@ -77,12 +99,17 @@ class PisaMath(ttk.Frame):
             self.result_label['text'] = GIVE_ANSWER_TEXT
             return
 
-        if( num2 == self.eka_luku*self.toka_luku) :
+        correct_answer = 0
+        if (self.v.get() == 1):
+            correct_answer = self.first_number*self.second_number
+        else:
+            correct_answer = self.first_number + self.second_number
 
-            self.eka_luku =  random.randint(2,9)
-            self.toka_luku =  random.randint(2,9)
+        if(num2 == correct_answer) :
+
+            self.randomize_nums()
             self.correct_answers = self.correct_answers + 1
-            self.num1_entry['text'] = str(self.eka_luku) + str("*") + str(self.toka_luku)
+            self.randomize_nums()
             self.result_label['text'] = CORRECT_ANSWER_TEXT
             self.correct_answers_label['text'] = TOTAL_SCORE_TEXT + str(self.correct_answers)
 
@@ -128,6 +155,14 @@ class PisaMath(ttk.Frame):
         ttk.Label(self, text=APPLICATION_NAME_TEXT).grid(column=0, row=0, columnspan=4)
         ttk.Separator(self, orient='horizontal').grid(column=0, row=1, columnspan=4, sticky='ew')
 
+        self.v = tkinter.IntVar()
+        self.rdbm = ttk.Radiobutton(self, text=MULTIPLICATION_TEXT,
+                                    variable=self.v, value=1, command=self.change_calc_type)
+        self.rdbm.grid(column=2, row=6, columnspan=4, sticky="w")
+        self.rdba = ttk.Radiobutton(self, text=ADDITION_TEXT,
+                                    variable=self.v, value=2, command=self.change_calc_type)
+        self.rdba.grid(column=2, row=7, columnspan=4, sticky='w')
+
         for child in self.winfo_children():
             child.grid_configure(padx=5, pady=5)
 
@@ -135,5 +170,6 @@ class PisaMath(ttk.Frame):
 
 if __name__ == '__main__':
     root = tkinter.Tk()
+    root.geometry("330x200+30+30")
     PisaMath(root)
     root.mainloop()
