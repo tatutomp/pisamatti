@@ -23,14 +23,13 @@ STATUS_TEXT = "Tilanne"
 WRONG_TEXT = "V‰‰rin! "
 YOUR_ANSWER_TEXT = "Vastaus"
 
-configfile_name = 'config.xml'
+
 
 
 class PisaMath(ttk.Frame):
 
-
-
-    # Check if there is already a configurtion file
+    configfile_name = 'config.xml'
+    # Check if there is already a configuration file
     if not os.path.isfile(configfile_name):
         # Create the configuration file as it doesn't exist yet
         cfgfile = open(configfile_name, 'w')
@@ -84,7 +83,7 @@ class PisaMath(ttk.Frame):
             self.toka_luku =  random.randint(2,9)
             self.correct_answers = self.correct_answers + 1
             self.num1_entry['text'] = str(self.eka_luku) + str("*") + str(self.toka_luku)
-            self.answer_label['text'] = CORRECT_TEXT + SCORE_TEXT + str(self.correct_answers)
+            self.answer_label['text'] = CORRECT_TEXT + TOTAL_SCORE_TEXT + str(self.correct_answers)
 
             self.cfgfile = open(self.configfile_name, 'w')
             self.Config = configparser.ConfigParser()
@@ -94,7 +93,7 @@ class PisaMath(ttk.Frame):
             self.cfgfile.close()
 
         else:
-            self.answer_label['text'] = WRONG_TEXT + SCORE_TEXT  +str(self.correct_answers)
+            self.answer_label['text'] = WRONG_TEXT + TOTAL_SCORE_TEXT  +str(self.correct_answers)
 
     def OnEnter(self, event):
         self.calculate()
