@@ -110,7 +110,9 @@ class PisaMath(ttk.Frame):
             self.randomize_nums()
             self.correct_answers = self.correct_answers + 1
             self.randomize_nums()
+            self.result_label.configure(foreground='green')
             self.result_label['text'] = CORRECT_ANSWER_TEXT
+
             self.correct_answers_label['text'] = TOTAL_SCORE_TEXT + str(self.correct_answers)
 
             self.cfgfile = open(self.configfile_name, 'w')
@@ -121,6 +123,7 @@ class PisaMath(ttk.Frame):
             self.cfgfile.close()
 
         else:
+            self.result_label.configure(foreground='red')
             self.result_label['text'] = WRONG_TEXT
             self.correct_answers_label['text'] = TOTAL_SCORE_TEXT + str(self.correct_answers)
 
